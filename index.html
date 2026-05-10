@@ -1,0 +1,1474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Ugo Raskin — Game &amp; XR Designer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<template id="__bundler_thumbnail" data-bg-color="#f3efe7">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#f3efe7"/>
+    <circle cx="600" cy="360" r="140" fill="none" stroke="#13110d" stroke-width="6"/>
+    <text x="600" y="408" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="160" fill="#13110d">UR</text>
+    <rect x="540" y="560" width="120" height="4" fill="#c2391d"/>
+  </svg>
+</template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3efe7;
+    --paper-2:#ebe6dc;
+    --paper-3:#e3ddd0;
+    --ink:#13110d;
+    --ink-2:#3a352b;
+    --muted:#8e887a;
+    --line:#13110d;
+    --line-soft:rgba(19,17,13,.22);
+    --accent:#c2391d;
+    --accent-2:#205c4f;
+    --serif:'Instrument Serif', Georgia, serif;
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+
+    --rail:88px;
+    --side-pad:32px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html,body{
+    margin:0;padding:0;background:var(--paper);color:var(--ink);
+    font-family:var(--mono);font-weight:400;font-size:13px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--ink);color:var(--paper)}
+
+  /* paper grain (very subtle) */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;mix-blend-mode:multiply;opacity:.06;
+    background-image:radial-gradient(circle at 20% 30%, rgba(19,17,13,.4) 0 1px, transparent 1px),
+                     radial-gradient(circle at 70% 60%, rgba(19,17,13,.3) 0 1px, transparent 1px);
+    background-size: 3px 3px, 5px 5px;
+  }
+
+  /* ── layout shell ─────────────────────────────────────── */
+  .shell{
+    position:relative;min-height:100vh;
+    padding:0 var(--rail);
+  }
+  /* fixed left rail */
+  .rail{
+    position:fixed;top:0;bottom:0;width:var(--rail);
+    background:var(--paper);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+    padding:24px 0;z-index:30
+  }
+  .rail.left{left:0}
+  .rail.right{right:0;border-right:0;border-left:1px solid var(--line)}
+
+  .logo{
+    width:44px;height:44px;border-radius:50%;border:1px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:18px;font-style:italic;
+    background:var(--paper);transition:background .25s ease,color .25s ease;cursor:pointer;
+  }
+  .logo:hover{background:var(--ink);color:var(--paper)}
+
+  .rail-nav{
+    display:flex;flex-direction:column;align-items:center;gap:28px;
+  }
+  .rail-nav a{
+    writing-mode:vertical-rl;transform:rotate(180deg);
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ink);text-decoration:none;position:relative;padding:6px 0;
+    transition:color .2s ease;
+  }
+  .rail-nav a .num{display:block;font-family:var(--serif);font-style:italic;font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:.05em;text-transform:none}
+  .rail-nav a::after{
+    content:"";position:absolute;left:50%;transform:translateX(-50%);
+    bottom:-10px;width:5px;height:5px;border-radius:50%;background:var(--ink);opacity:0;
+    transition:opacity .2s ease
+  }
+  .rail-nav a.active::after{opacity:1}
+  .rail-nav a:hover{color:var(--accent)}
+
+  .rail-foot{
+    display:flex;flex-direction:column;align-items:center;gap:16px;font-family:var(--mono);
+    font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)
+  }
+  .rail-foot .yr{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--ink);text-transform:none;letter-spacing:0}
+
+  /* right rail content */
+  .rail.right .scroll-cue{
+    display:flex;flex-direction:column;align-items:center;gap:14px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-2)
+  }
+  .rail.right .scroll-cue .arrow{
+    width:34px;height:34px;border:1px solid var(--ink);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s ease,color .2s ease;cursor:pointer
+  }
+  .rail.right .scroll-cue .arrow:hover{background:var(--ink);color:var(--paper)}
+  .rail.right .scroll-cue span{writing-mode:vertical-rl;transform:rotate(180deg)}
+
+  .rail.right .clock{
+    font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.18em;text-transform:uppercase;
+    writing-mode:vertical-rl;transform:rotate(180deg)
+  }
+  .rail.right .here{
+    font-family:var(--serif);font-size:13px;font-style:italic;
+    writing-mode:vertical-rl;transform:rotate(180deg);color:var(--ink-2)
+  }
+
+  /* ── sections ─────────────────────────────────────────── */
+  section.page{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:80px var(--side-pad);position:relative;
+  }
+
+  /* HERO */
+  .hero{display:grid;grid-template-rows:auto 1fr auto;gap:24px}
+  .hero-top{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2)
+  }
+  .hero-top .meta-block{display:flex;gap:36px;flex-wrap:wrap}
+  .hero-top .meta-block div{display:flex;flex-direction:column;gap:4px}
+  .hero-top .meta-block .k{color:var(--muted);font-size:9px}
+  .hero-top .meta-block .v{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink);text-transform:none;letter-spacing:0}
+
+  .hero-headline{
+    font-family:var(--serif);font-weight:400;font-style:normal;
+    font-size:clamp(56px, 9.8vw, 168px);line-height:.98;letter-spacing:-.015em;
+    margin:0;color:var(--ink);
+  }
+  .hero-headline .hi{font-style:italic;display:inline-block;position:relative}
+  .hero-headline .hi::after{
+    content:"";position:absolute;left:0;right:0;bottom:.06em;height:.06em;
+    background:var(--accent);transform:scaleX(0);transform-origin:left;
+    animation:underline 1.4s .6s cubic-bezier(.7,0,.2,1) forwards
+  }
+  @keyframes underline{to{transform:scaleX(1)}}
+  .hero-headline em{font-style:italic;color:var(--ink-2)}
+  .hero-headline .dot{color:var(--accent)}
+
+  .hero-bottom{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:24px;
+    border-top:1px solid var(--line);padding-top:18px
+  }
+  .hero-bottom .lede{
+    max-width:460px;font-size:13px;color:var(--ink-2);line-height:1.55;
+  }
+  .hero-bottom .lede b{color:var(--ink);font-weight:500}
+  .hero-bottom .center-mark{
+    font-family:var(--serif);font-style:italic;font-size:13px;color:var(--muted)
+  }
+  .hero-bottom .next-cue{
+    justify-self:end;display:flex;align-items:center;gap:14px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2)
+  }
+  .hero-bottom .next-cue a{color:inherit;text-decoration:none;border-bottom:1px solid var(--ink);padding-bottom:1px}
+  .hero-bottom .next-cue .arrow{
+    width:34px;height:34px;border:1px solid var(--ink);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;animation:bob 2.2s ease-in-out infinite
+  }
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+  /* WORK */
+  #work{padding-top:60px;padding-bottom:60px}
+  .work-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;gap:24px;flex-wrap:wrap}
+  .work-head .lhs h2{
+    font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(38px,5.6vw,76px);
+    line-height:.95;margin:0;letter-spacing:-.01em
+  }
+  .work-head .lhs .sub{
+    margin-top:6px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)
+  }
+  .work-head .rhs{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;letter-spacing:.16em;text-transform:uppercase;line-height:1.6}
+  .work-head .rhs b{color:var(--ink);font-weight:500}
+
+  .cat-tabs{
+    display:flex;gap:2px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    margin-bottom:22px;overflow:hidden
+  }
+  .cat-tabs button{
+    appearance:none;background:transparent;border:0;border-right:1px solid var(--line-soft);
+    padding:14px 20px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-2);cursor:pointer;flex:1;text-align:left;
+    display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+    transition:background .2s ease,color .2s ease;
+    position:relative;
+  }
+  .cat-tabs button:last-child{border-right:0}
+  .cat-tabs button .count{font-size:9px;color:var(--muted);font-family:var(--serif);font-style:italic;font-size:13px;letter-spacing:0;text-transform:none}
+  .cat-tabs button:hover{background:var(--paper-2);color:var(--ink)}
+  .cat-tabs button.active{background:var(--ink);color:var(--paper)}
+  .cat-tabs button.active .count{color:var(--paper)}
+
+  /* stage */
+  .stage{
+    display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:34px;
+    min-height:560px;
+  }
+
+  .thumbs{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+    height:560px;position:relative;perspective:1200px
+  }
+  .thumbs[data-count="1"]{grid-template-columns:1fr}
+  .thumbs[data-count="2"]{grid-template-columns:repeat(2,1fr)}
+  .thumbs[data-count="3"]{grid-template-columns:repeat(3,1fr)}
+  .thumbs[data-count="4"]{grid-template-columns:repeat(4,1fr)}
+  .thumb{
+    position:relative;border:1px solid var(--line);background:var(--paper-2);
+    overflow:hidden;cursor:pointer;
+    transition:
+      transform .55s cubic-bezier(.22,1,.36,1),
+      box-shadow .55s cubic-bezier(.22,1,.36,1),
+      filter .35s ease,
+      opacity .35s ease;
+    transform-origin:center center;
+    will-change:transform;
+  }
+  .thumb .thumb-img{
+    position:absolute;inset:0;
+    background-image:
+      repeating-linear-gradient(135deg, transparent 0 9px, rgba(19,17,13,.10) 9px 10px);
+    transition:transform .8s cubic-bezier(.22,1,.36,1),filter .35s ease;
+  }
+  .thumb .thumb-img.real{
+    background-image:none;
+    background-size:cover;
+    background-position:center;
+  }
+  .thumb .thumb-shade{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(19,17,13,0) 20%, rgba(19,17,13,.9) 100%);
+    opacity:1;
+    transition:opacity .3s ease;
+  }
+  .thumb .thumb-num{
+    position:absolute;top:14px;left:14px;
+    font-family:var(--serif);font-style:italic;font-size:24px;color:var(--paper);
+    text-shadow:0 1px 0 rgba(0,0,0,.4);
+  }
+  .thumb .thumb-tag{
+    position:absolute;
+    top:14px;
+    right:14px;
+    font-family:var(--mono);
+    font-size:9px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--paper);
+    background:rgba(19,17,13,.55);
+    padding:3px 7px;
+    backdrop-filter:blur(4px);
+  }
+  .thumb .thumb-meta{
+    position:absolute;left:14px;right:14px;bottom:14px;color:var(--paper);
+    transition:transform .4s ease;
+  }
+  .thumb .thumb-meta .title{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:22px;
+    line-height:1.05;
+    margin:0 0 4px;
+  }
+  .thumb .thumb-meta .role{
+    font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.85
+  }
+  .thumb.empty{
+    background:var(--paper-2);border-style:dashed;
+  }
+  .thumb.empty .thumb-img{
+    background-image:
+      repeating-linear-gradient(135deg, transparent 0 7px, rgba(19,17,13,.06) 7px 8px);
+  }
+  .thumb.empty .thumb-shade{display:none}
+  .thumb.empty .thumb-num,
+  .thumb.empty .thumb-tag,
+  .thumb.empty .thumb-meta{color:var(--ink-2)}
+  .thumb.empty .thumb-tag{background:var(--paper);color:var(--muted);border:1px solid var(--line-soft)}
+  .thumb.empty .thumb-meta .title{font-style:italic;color:var(--ink-2)}
+
+  /* states */
+  .thumbs.has-active .thumb:not(.active){
+    opacity:.42;filter:grayscale(.4);
+  }
+  .thumbs.has-active .thumb:not(.active) .thumb-img{transform:scale(1.02)}
+  .thumb.active{
+    transform:translate(-22px,-26px) rotate(-2.4deg);
+    box-shadow:
+      14px 16px 0 -1px var(--accent),
+      14px 16px 0 0 var(--ink);
+    z-index:5;
+    filter:none;opacity:1
+  }
+  .thumb.active .thumb-shade{opacity:.65}
+  .thumb.active .thumb-num{color:var(--accent)}
+  .thumb.pinned{
+    /* pinned (after click/tap) gets a small ring */
+    outline:2px solid var(--accent);outline-offset:4px;
+  }
+
+  /* DETAIL PANEL */
+  .panel{
+    border:1px solid var(--line);background:var(--paper-2);
+    padding:26px 28px;display:flex;flex-direction:column;gap:14px;
+    position:relative;overflow:hidden;min-height:560px;
+  }
+  .panel .panel-meta{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+    border-bottom:1px solid var(--line-soft);padding-bottom:10px
+  }
+  .panel .panel-meta .pin-hint{color:var(--accent)}
+  .panel .panel-meta .pin-hint.hidden{display:none}
+  .panel .ptitle{
+    font-family:var(--serif);font-weight:400;font-style:italic;font-size:42px;line-height:1.02;margin:0;
+    letter-spacing:-.005em
+  }
+  .panel .ptag{
+    font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)
+  }
+  .panel .pmeta-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:0;
+    border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)
+  }
+  .panel .pmeta-grid div{
+    padding:10px 0;border-right:1px dashed var(--line-soft);font-size:11px;color:var(--ink-2);line-height:1.4
+  }
+  .panel .pmeta-grid div:nth-child(2n){border-right:0;padding-left:14px}
+  .panel .pmeta-grid div:nth-child(2n-1){padding-right:14px}
+  .panel .pmeta-grid b{display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:400;margin-bottom:3px}
+  .panel .pdesc{font-size:13px;color:var(--ink-2);line-height:1.6;max-width:55ch}
+  .panel .pdesc p{margin:0 0 8px}
+  .panel .pgallery{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:auto;
+  }
+  .panel .pgallery .ph{
+    aspect-ratio:4/3;border:1px solid var(--line-soft);
+    background-image:repeating-linear-gradient(135deg, transparent 0 6px, rgba(19,17,13,.08) 6px 7px);
+    position:relative
+  }
+  .panel .pgallery .ph::after{
+    content:attr(data-label);position:absolute;left:6px;bottom:5px;font-size:9px;
+    color:var(--muted);text-transform:uppercase;letter-spacing:.1em
+  }
+  .panel .pgallery .ph.real{
+    background-size:cover;background-position:center;
+  }
+  .panel .pgallery .ph.real::after{
+    color:var(--paper);text-shadow:0 1px 2px rgba(0,0,0,.55);
+  }
+
+  /* fade transitions when panel content swaps */
+  .panel-body{display:flex;flex-direction:column;gap:14px;flex:1;transition:opacity .25s ease,transform .25s ease}
+  .panel-body.swapping{opacity:0;transform:translateX(8px)}
+
+  /* resting (no project hovered) */
+  .panel.resting .panel-body{display:none}
+  .panel.resting .resting-state{display:flex}
+  .resting-state{
+    display:none;flex-direction:column;align-items:flex-start;gap:14px;flex:1;justify-content:center
+  }
+  .resting-state .big{
+    font-family:var(--serif);font-style:italic;font-size:34px;color:var(--ink-2);line-height:1.05;
+    max-width:14ch
+  }
+  .resting-state .arrow-back{
+    display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--accent)
+  }
+  .resting-state .arrow-back svg{transform:rotate(0deg)}
+  .panel:not(.resting) .resting-state{display:none}
+
+  /* ── ABOUT ─────────────────────────────────────────────── */
+  #about{padding-top:120px;padding-bottom:120px}
+  .about-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:60px;align-items:center}
+  .portrait{
+    border:1px solid var(--line);aspect-ratio:3/4;position:relative;background:var(--paper-2);
+    background-image: url("content/ugoGreece.jpg") /*repeating-linear-gradient(135deg, transparent 0 9px, rgba(19,17,13,.08) 9px 10px)*/;
+    background-size: cover;
+    background-position: center;
+  }
+  .portrait::after{
+    content:"[ Ugo having a good experience ]";position:absolute;left:14px;bottom:10px;font-size:10px;
+    color:var(--muted);background:var(--paper);padding:3px 7px;border:1px solid var(--line-soft);
+    letter-spacing:.14em;text-transform:uppercase
+  }
+  .about-copy h3{
+    font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(34px,4.6vw,60px);
+    line-height:1.02;margin:0 0 18px;letter-spacing:-.005em
+  }
+  .about-copy h3 em{font-style:normal;color:var(--accent)}
+  .about-copy p{font-size:14px;line-height:1.65;color:var(--ink-2);margin:0 0 12px;max-width:60ch}
+  .about-copy .facts{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:24px;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line)
+  }
+  .about-copy .facts div{padding:14px 0;border-right:1px dashed var(--line-soft);font-size:11px;letter-spacing:.04em}
+  .about-copy .facts div:last-child{border-right:0}
+  .about-copy .facts b{display:block;font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink);margin-bottom:2px}
+  .about-copy .facts span{color:var(--muted);font-size:9px;letter-spacing:.18em;text-transform:uppercase}
+
+  /* ── SKILLS ────────────────────────────────────────────── */
+  #skills{padding-top:80px;padding-bottom:80px}
+  .skills-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px}
+  .skills-head h2{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(34px,5vw,64px);line-height:.95;margin:0}
+  .skills-head .index{font-size:10px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase}
+
+  .skills-grid{display:grid;grid-template-columns:280px 1fr;gap:48px;align-items:start}
+
+  /* left column */
+  .sk-left{display:flex;flex-direction:column;gap:36px}
+  .sk-block .sk-h{
+    display:flex;align-items:center;gap:10px;margin-bottom:16px;
+    font-family:var(--serif);font-style:italic;font-size:24px;font-weight:400;color:var(--ink);
+  }
+  .sk-block .sk-h .glyph{
+    width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
+    color:var(--accent);
+  }
+  .sk-block .sk-h .glyph svg{width:100%;height:100%}
+
+  .lang-list{display:flex;flex-direction:column;gap:0}
+  .lang-list .row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:12px 0;border-bottom:1px solid var(--line-soft);
+  }
+  .lang-list .row:last-child{border-bottom:0}
+  .lang-list .row .l{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--ink)}
+  .lang-list .row .lvl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .lang-list .row .lvl.native{color:var(--accent)}
+
+  .soft-pills{display:flex;flex-wrap:wrap;gap:8px}
+  .soft-pills span{
+    display:inline-block;padding:8px 14px;border:1px solid var(--line);
+    border-radius:999px;background:var(--paper);
+    font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);
+    transition:background .2s ease,color .2s ease,border-color .2s ease;cursor:default;
+  }
+  .soft-pills span:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+  /* right column — tech stack */
+  .stack-wrap .stack-h{
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);
+    margin-bottom:14px;display:flex;align-items:baseline;gap:10px
+  }
+  .stack-wrap .stack-h::before{
+    content:"";display:inline-block;width:14px;height:1px;background:var(--ink);transform:translateY(-3px)
+  }
+  .stack-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  }
+  .stack-card{
+    border:1px solid var(--line);background:var(--paper);
+    padding:18px 18px 22px;display:flex;flex-direction:column;gap:14px;min-height:200px;
+    transition:background .2s ease,transform .2s ease,box-shadow .2s ease;
+  }
+  .stack-card:hover{
+    background:var(--paper-2);
+    transform:translate(-2px,-2px);
+    box-shadow:4px 4px 0 0 var(--ink);
+  }
+  .stack-card .cat{
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);
+    border-bottom:1px dashed var(--line-soft);padding-bottom:10px
+  }
+  .stack-card .items{
+    display:flex;flex-wrap:wrap;gap:8px 10px;
+  }
+  .stack-card .item{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:var(--mono);font-size:11px;color:var(--ink);letter-spacing:.02em;
+  }
+  .stack-card .item .dot{
+    width:8px;height:8px;border-radius:50%;flex-shrink:0;
+    background:var(--ink);border:1px solid var(--ink);
+  }
+  .stack-card .item.use-1 .dot{background:var(--accent);border-color:var(--accent)}
+  .stack-card .item.use-2 .dot{background:var(--accent-2);border-color:var(--accent-2)}
+  .stack-card .item.use-3 .dot{background:var(--paper);border-color:var(--ink)}
+  .stack-card .item.full{flex-basis:100%}
+
+  /* ── EDUCATION ─────────────────────────────────────────── */
+  #path{padding-top:80px;padding-bottom:80px}
+  .path-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:30px}
+  .path-head h2{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(34px,5vw,64px);line-height:.95;margin:0}
+  .path-head .index{font-size:10px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase}
+  .timeline{position:relative;padding-left:32px}
+  .timeline::before{
+    content:"";position:absolute;left:6px;top:6px;bottom:6px;width:1px;background:var(--line)
+  }
+  .tl-item{position:relative;padding:18px 0 22px;border-bottom:1px dashed var(--line-soft)}
+  .tl-item:last-child{border-bottom:0}
+  .tl-item::before{
+    content:"";position:absolute;left:-30px;top:24px;width:13px;height:13px;
+    border-radius:50%;background:var(--paper);border:1px solid var(--ink)
+  }
+  .tl-item.now::before{background:var(--accent);border-color:var(--accent)}
+  .tl-row{display:grid;grid-template-columns:140px 1fr auto;gap:24px;align-items:baseline}
+  .tl-row .when{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .tl-row .what h4{font-family:var(--serif);font-weight:400;font-style:italic;font-size:22px;margin:0 0 4px;line-height:1.1}
+  .tl-row .what .where{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.06em}
+  .tl-row .kind{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);text-align:right}
+
+  /* ── CONTACT ───────────────────────────────────────────── */
+  #contact{
+    padding-top:120px;padding-bottom:120px;background:var(--ink);color:var(--paper);
+    margin:0 calc(-1 * var(--rail));
+    padding-left:calc(var(--rail) + var(--side-pad));padding-right:calc(var(--rail) + var(--side-pad));
+  }
+  #contact .ct-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:38px}
+  #contact .ct-head h2{
+    font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(56px,8vw,128px);
+    line-height:.92;margin:0;letter-spacing:-.015em
+  }
+  #contact .ct-head h2 em{color:var(--accent);font-style:normal}
+  #contact .ct-head .index{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(243,239,231,.5)}
+  .ct-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:60px;align-items:start}
+  .ct-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .ct-form .full{grid-column:1/-1}
+  .ct-form .field{
+    background:transparent;color:var(--paper);border:0;border-bottom:1px solid rgba(243,239,231,.3);
+    padding:14px 2px;font-family:var(--mono);font-size:13px;letter-spacing:.04em;outline:none;
+    transition:border-color .2s ease
+  }
+  .ct-form .field:focus{border-color:var(--accent)}
+  .ct-form .field::placeholder{color:rgba(243,239,231,.4);font-style:italic;font-family:var(--serif);font-size:16px}
+  .ct-form textarea.field{min-height:110px;resize:vertical}
+  .ct-form .send{
+    grid-column:1/-1;justify-self:start;margin-top:8px;
+    appearance:none;background:transparent;color:var(--paper);
+    border:1px solid var(--paper);padding:12px 24px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    cursor:pointer;display:inline-flex;align-items:center;gap:14px;
+    transition:background .2s ease,color .2s ease
+  }
+  .ct-form .send:hover{background:var(--accent);border-color:var(--accent)}
+  .ct-form .send .arrow{transition:transform .25s ease}
+  .ct-form .send:hover .arrow{transform:translateX(4px)}
+
+  .ct-side{display:flex;flex-direction:column;gap:0}
+  .ct-side .row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid rgba(243,239,231,.18);padding:14px 0;
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase
+  }
+  .ct-side .row b{color:rgba(243,239,231,.5);font-weight:400;font-size:9px;letter-spacing:.22em}
+  .ct-side .row .v{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--paper);text-transform:none;letter-spacing:0}
+  .ct-side .row .v a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(243,239,231,.4)}
+  .ct-side .row .v a:hover{color:var(--accent);border-color:var(--accent)}
+  .ct-side .socials{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:24px
+  }
+  .ct-side .socials a{
+    border:1px solid rgba(243,239,231,.4);padding:10px 14px;font-family:var(--mono);
+    font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--paper);text-decoration:none;
+    display:inline-flex;align-items:center;gap:10px;transition:background .2s ease,color .2s ease,border-color .2s ease
+  }
+  .ct-side .socials a:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+
+  #contact .ct-foot{
+    margin-top:60px;display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(243,239,231,.45);
+    border-top:1px solid rgba(243,239,231,.2);padding-top:18px
+  }
+  #contact .ct-foot .yr{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--paper);text-transform:none;letter-spacing:0}
+
+  /* ── responsive ──────────────────────────────────────── */
+  @media (max-width: 1100px){
+    .stage{grid-template-columns:1fr;height:auto}
+    .thumbs{height:380px}
+    .panel{min-height:auto}
+    .about-grid{grid-template-columns:1fr;gap:30px}
+    .portrait{aspect-ratio:4/3;max-width:480px}
+    .skills-grid{grid-template-columns:1fr;gap:36px}
+    .stack-grid{grid-template-columns:repeat(2,1fr)}
+    .ct-grid{grid-template-columns:1fr;gap:36px}
+  }
+  @media (max-width: 720px){
+    :root{--rail:48px;--side-pad:18px}
+    .rail{padding:14px 0}
+    .logo{width:34px;height:34px;font-size:15px}
+    .rail-nav{gap:18px}
+    .rail-nav a{font-size:10px;letter-spacing:.18em}
+    .rail.right .clock,.rail.right .here{display:none}
+    .hero-bottom{grid-template-columns:1fr;gap:18px;text-align:left}
+    .hero-bottom .next-cue{justify-self:start}
+    .thumbs{grid-template-columns:1fr 1fr;height:auto;gap:10px}
+    .thumb{aspect-ratio:3/4}
+
+    /* ── thumb card: prevent tag/title overlap on narrow cards ── */
+    /* top row: num (left) + tag (right) — give each half the card */
+    .thumb .thumb-num{
+      top:10px;left:10px;
+      font-size:18px;
+    }
+    .thumb .thumb-tag{
+      top:10px;right:10px;
+      max-width:calc(50% - 14px);   /* never wider than half the card */
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size:8px;
+      padding:2px 5px;
+    }
+    /* bottom meta: anchor tightly and scale title down */
+    .thumb .thumb-meta{
+      left:10px;right:10px;bottom:10px;
+    }
+    .thumb .thumb-meta .title{
+      font-size:15px;
+      line-height:1.1;
+      /* clamp to 2 lines max so it never pushes into the tag */
+      display:-webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+      margin-bottom:3px;
+    }
+    .thumb .thumb-meta .role{
+      font-size:9px;
+      letter-spacing:.10em;
+      /* single line, truncate if needed */
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .work-head{flex-direction:column;align-items:flex-start;gap:10px}
+    .cat-tabs{flex-wrap:wrap}
+    .cat-tabs button{flex:1 1 50%;border-bottom:1px solid var(--line-soft)}
+    .stack-grid{grid-template-columns:1fr}
+    .ct-form{grid-template-columns:1fr}
+    .tl-row{grid-template-columns:1fr;gap:6px}
+    .tl-row .kind{text-align:left}
+    #contact{margin:0 calc(-1 * var(--rail));padding-left:calc(var(--rail) + var(--side-pad));padding-right:calc(var(--rail) + var(--side-pad))}
+  }
+
+  /* ── extra-small phones (≤ 400px) — single-column thumbs ── */
+  @media (max-width: 400px){
+    .thumbs{grid-template-columns:1fr}
+    .thumb{aspect-ratio:4/3}
+    .thumb .thumb-meta .title{font-size:18px;line-clamp:1;-webkit-line-clamp:1}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LEFT RAIL ── -->
+<aside class="rail left">
+  <div class="logo" title="Ugo Raskin">UR</div>
+  <nav class="rail-nav">
+    <a href="#hero" class="active"><span class="num">01</span>Hello</a>
+    <a href="#work"><span class="num">02</span>Work</a>
+    <a href="#about"><span class="num">03</span>About</a>
+    <a href="#skills"><span class="num">04</span>Skills</a>
+    <a href="#path"><span class="num">05</span>Path</a>
+    <a href="#contact"><span class="num">06</span>Contact</a>
+  </nav>
+  <div class="rail-foot">
+    <span class="yr">'26</span>
+    <span>be</span>
+  </div>
+</aside>
+
+<!-- ── RIGHT RAIL ── -->
+<aside class="rail right">
+  <div class="here">Belgium</div>
+  <div class="scroll-cue">
+    <div class="arrow" id="scroll-arrow" title="Scroll">↓</div>
+    <span>Scroll</span>
+  </div>
+  <div class="clock" id="clock">— : —</div>
+</aside>
+
+<!-- ── PAGE ── -->
+<main class="shell">
+
+  <!-- HERO -->
+  <section id="hero" class="page hero">
+    <div class="hero-top">
+      <div class="meta-block">
+        <div><span class="k">Portfolio</span><span class="v">2026</span></div>
+        <div><span class="k">Discipline</span><span class="v">Game &amp; XR design</span></div>
+      </div>
+      <div class="meta-block">
+        <div><span class="k">Status</span><span class="v">Open to work</span></div>
+      </div>
+    </div>
+
+    <h1 class="hero-headline">
+      <span class="hi">Hello there</span><span class="dot">,</span><br>
+      I'm Ugo — a <em>game &amp;<br>xr designer</em><span class="dot">.</span>
+    </h1>
+
+    <div class="hero-bottom">
+      <p class="lede">
+        Curious and critical-minded, I bridge <b>immersive technology</b> and practical user needs.
+        <b>MSc in Digital Games</b> (UoM, '25) · <b>BA in Digital Society</b> (Maastricht, '23).
+      </p>
+      <div class="center-mark">— ✶ —</div>
+      <div class="next-cue">
+        <span><a href="#work">See selected work</a></span>
+        <div class="arrow">↓</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work" class="page">
+    <div class="work-head">
+      <div class="lhs">
+        <h2>Selected work.</h2>
+        <div class="sub">02 / 06 — showcasing multidisciplinarity</div>
+      </div>
+      <div class="rhs">
+        <b>16</b> projects<br>
+        <b>05</b> categories<br>
+        2018 — 2026
+      </div>
+    </div>
+
+    <div class="cat-tabs" id="cat-tabs">
+      <button class="active" data-cat="game">Game Design <span class="count">04</span></button>
+      <button data-cat="xr">XR Design <span class="count">02</span></button>
+      <button data-cat="3d">3D Modeling <span class="count">04</span></button>
+      <button data-cat="motion">Motion Design <span class="count">02</span></button>
+      <button data-cat="research">Research <span class="count">04</span></button>
+    </div>
+
+    <div class="stage">
+      <div class="thumbs" id="thumbs"><!-- injected --></div>
+
+      <div class="panel resting" id="panel">
+        <div class="panel-meta">
+          <span id="panel-counter">— / —</span>
+          <span class="pin-hint" id="pin-hint">click to pin ✦</span>
+        </div>
+        <div class="resting-state">
+          <div class="arrow-back">
+            <svg width="28" height="14" viewBox="0 0 28 14" fill="none"><path d="M27 7H1M1 7L7 1M1 7L7 13" stroke="currentColor" stroke-width="1.2"/></svg>
+            hover a thumbnail
+          </div>
+          <div class="big">Each card lifts as you point at it,<br>and tells its story here.</div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:auto">
+            esc to release
+          </div>
+        </div>
+        <div class="panel-body" id="panel-body">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="page">
+    <div class="about-grid">
+      <div class="portrait"></div>
+      <div class="about-copy">
+        <h3>I strive in giving <em>impactful experiences</em>, to explore critical questions and push boundaries.</h3>
+        <p>
+          With a Master in Digital Games and a Bachelor in Digital Society, I sit between two worlds: Where I build digital experiences as an opportunity to study how digitalization reshapes culture, social structures and daily life.
+        </p>
+        <p>
+          With my fellow students, I designed a rhythm-zombie shooter (Unity, 88/100), tested game elements for Mighty Boards, and most recently designed XR trainings for the EHS industry at Altheria Solutions. I care about playtest data, lucid systems, and experiences that mean something to the "enjoyer". I belive that games are impactful tools with infinite potential.
+        </p>
+        <div class="facts">
+          <div><b>Brussels, BE</b><span>based</span></div>
+          <div><b>EN · FR</b><span>fluent</span></div>
+          <div><b>Open</b><span>to work</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="page">
+    <div class="skills-head">
+      <h2>Skills &amp; tools.</h2>
+      <span class="index">04 / 06</span>
+    </div>
+    <div class="skills-grid">
+      <div class="sk-left">
+        <div class="sk-block">
+          <div class="sk-h">
+            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg></span>
+            Languages
+          </div>
+          <div class="lang-list">
+            <div class="row"><span class="l">French</span><span class="lvl native">Native</span></div>
+            <div class="row"><span class="l">English</span><span class="lvl">Professional</span></div>
+          </div>
+        </div>
+
+        <div class="sk-block">
+          <div class="sk-h">
+            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 3l2.6 5.3L20 9l-4 3.9.9 5.6L12 16l-4.9 2.5.9-5.6L4 9l5.4-.7L12 3z"/></svg></span>
+            Soft Skills
+          </div>
+          <div class="soft-pills">
+            <span>Systems Thinking</span>
+            <span>Playtesting</span>
+            <span>Critical Analysis</span>
+            <span>Team Collaboration</span>
+            <span>Documentation & Research</span>
+            <span>Iteration</span>
+            <span>Bias for Action</span>
+            <span>Dealing w/ Ambiguity</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-wrap">
+        <div class="stack-h">Software</div>
+        <div class="stack-grid">
+          <div class="stack-card">
+            <div class="cat">Game Engines</div>
+            <div class="items">
+              <span class="item use-1"><span class="dot"></span>Unity</span>
+            </div>
+          </div>
+          <div class="stack-card">
+            <div class="cat">3D / Art</div>
+            <div class="items">
+              <span class="item use-1"><span class="dot"></span>Blender</span>
+              <span class="item"><span class="dot"></span>Substance 3D Painter</span>
+            </div>
+          </div>
+          <div class="stack-card">
+            <div class="cat">Design / UX</div>
+            <div class="items">
+              <span class="item use-2"><span class="dot"></span>Figma</span>
+              <span class="item use-1"><span class="dot"></span>Photoshop</span>
+              <span class="item"><span class="dot"></span>Ilustrator</span>
+            </div>
+          </div>
+          <div class="stack-card">
+            <div class="cat">AI</div>
+            <div class="items">
+              <span class="item use-1"><span class="dot"></span>Claude</span>
+              <span class="item use-2"><span class="dot"></span>Claude Design</span>
+              <span class="item"><span class="dot"></span>ComfyUI</span>
+              <span class="item use-1"><span class="dot"></span>Ollama</span>
+            </div>
+          </div>
+          <div class="stack-card">
+            <div class="cat">Motion / Video</div>
+            <div class="items">
+              <span class="item use-2"><span class="dot"></span>Premiere Pro</span>
+              <span class="item use-1"><span class="dot"></span>After Effects</span>
+              <span class="item"><span class="dot"></span>DaVinci</span>
+            </div>
+          </div>
+          <div class="stack-card">
+            <div class="cat">Production / Project Management</div>
+            <div class="items">
+              <span class="item"><span class="dot"></span>Jira</span>
+              <span class="item use-2"><span class="dot"></span>Notion</span>
+              <span class="item"><span class="dot"></span>Git</span>
+              <span class="item use-1"><span class="dot"></span>Miro</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATH -->
+  <section id="path" class="page">
+    <div class="path-head">
+      <h2>Path.</h2>
+      <span class="index">05 / 06</span>
+    </div>
+    <div class="timeline">
+      <div class="tl-item now">
+        <div class="tl-row">
+          <div class="when">Oct '25 — Jan '26</div>
+          <div class="what">
+            <h4>Game Design Internship</h4>
+            <div class="where">Altheria Solutions SARL · Brussels, BE — XR experiences for EHS industry · 2D/3D content · user data &amp; feedback</div>
+          </div>
+          <div class="kind">Work</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-row">
+          <div class="when">2023 — 2025</div>
+          <div class="what">
+            <h4>MSc Digital Games</h4>
+            <div class="where">University of Malta, MT — practical game development · critical game analysis · experimental tech</div>
+          </div>
+          <div class="kind">Education</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-row">
+          <div class="when">Mar — Aug '24</div>
+          <div class="what">
+            <h4>Quality Assurance Tester</h4>
+            <div class="where">Mighty Boards · Malta — playtest sessions · bug tracking · rulebook QA</div>
+          </div>
+          <div class="kind">Work</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-row">
+          <div class="when">2019 — 2023</div>
+          <div class="what">
+            <h4>BA Digital Society</h4>
+            <div class="where">Maastricht University, NL — digital revolution · social sciences · culture · politics of digitalization</div>
+          </div>
+          <div class="kind">Education</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-row">
+          <div class="when">2018 — 2019</div>
+          <div class="what">
+            <h4>Creative Media Production</h4>
+            <div class="where">Chichester College, UK — HD video · SLR · audio · motion graphics · graphic design</div>
+          </div>
+          <div class="kind">Education</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="page">
+    <div class="ct-head">
+      <h2>Wanna <em>talk</em>?</h2>
+      <span class="index">06 / 06</span>
+    </div>
+    <div class="ct-grid">
+      <form class="ct-form" onsubmit="event.preventDefault();this.querySelector('.send').textContent='Sent ✓'">
+        <input class="field" type="text" placeholder="Your name" required>
+        <input class="field" type="email" placeholder="Your email" required>
+        <input class="field full" type="text" placeholder="Subject">
+        <textarea class="field full" placeholder="Message"></textarea>
+        <button class="send" type="submit">Send <span class="arrow">→</span></button>
+      </form>
+      <div class="ct-side">
+        <div class="row"><b>email</b><span class="v"><a href="/cdn-cgi/l/email-protection#deacbfadb5b7b0abb9b19eb7bdb2b1abbaf0bdb1b3"><span class="__cf_email__" data-cfemail="eb998a988082859e8c84ab828887849e8fc5888486">[email&#160;protected]</span></a></span></div>
+        <div class="row"><b>phone</b><span class="v"><a href="tel:+32475768230">+32 475 76 82 30</a></span></div>
+        <div class="row"><b>location</b><span class="v">Brussels, Belgium</span></div>
+        <div class="socials">
+          <a href="https://linkedin.com/in/uraskin" target="_blank" rel="noopener">LinkedIn ↗</a>
+          <a href="https://github.com/Kino6F" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+    </div>
+    <div class="ct-foot">
+      <span>© Ugo Raskin · <span class="yr">2026</span></span>
+      <span>Designed &amp; built with ❤️ by yours truly</span>
+    </div>
+  </section>
+
+</main>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ── DATA ────────────────────────────────────────────────
+  const PROJECTS = {
+    game: [
+      {
+        id:'rave',
+        title:'Rave to the Grave',
+        tag:'Mobile',
+        year:'2024',
+        role:'Game Designer · UI · Tutorial',
+        team:'5 · University of Malta',
+        tools:'Unity · Figma',
+        outcome:'Final grade 88 / 100',
+        img:'content/game design/rave to the grave/rttg_zombieGirl.jpg',
+        imgs:[
+          'content/game design/rave to the grave/rttg_lobby.jpg',
+          'content/game design/rave to the grave/rttg_shot.jpg',
+          'content/game design/rave to the grave/rttg_tuto.jpg'
+        ],
+        desc:[
+          'A rhythm-driven zombie shooter for mobile, designed in a 5-person university team at the University of Malta. Players match the beat to fend off waves and progress through escalating dance-floor arenas.',
+          'I owned the role of game designer during this project where I worked on the narrative direction, the feedback loop, the UI and the in-game tutorial, ensuring first-time players grasp the rhythm system in under 30 seconds.'
+        ],
+        //gallery:['Lobby','In-game shot','Tutorial'],
+        full:true
+      },
+      {
+        id:'mental-breakdown',
+        title:'Mental Breakdown',
+        tag:'Card game',
+        year:'2023',
+        role:'Designer',
+        team:'Team of 2 · UoM',
+        tools:'Paper prototyping · Photoshop · Figma',
+        outcome:'Final grade 71 / 100',
+        img:'content/game design/mental breakdown/cover1.png',
+        imgs:[
+          'content/game design/mental breakdown/ConceptCards.png',
+          'content/game design/mental breakdown/setup.png',
+          'content/game design/mental breakdown/contentTable.png'
+        ],
+        desc:[
+          'Party card game inspired by Cards Against Humanity and Dixit, built entirely around improvisation prompts. In a team of two, designed the card set, box art, scoring system and playtested across several iterative rounds.',
+          'The game invites players to complete absurd mental-health-themed scenarios using a hand of prompt cards. Goal: dark humour tempered by absurdist logic. Accompanied by a full Game Design Document.'
+        ],
+        //gallery:['Box cover','Card spread','Playtest'],
+        //doc:'content/game design/mental breakdown/GameDesignDocument.pdf'
+      },
+      {
+        id:'fix-a-game',
+        title:'Fixing RISK',
+        tag:'Crit. Design',
+        year:'2024',
+        role:'Author',
+        team:'Solo · UoM',
+        tools:'Academic writing & research',
+        outcome:'Final grade 10/10',
+        img:'content/game design/fix a game essay/wallpaperSolarpunk.png',
+        imgs:[
+          'content/game design/fix a game essay/AI_draft.png',
+          '',
+          ''
+        ],
+        desc:[
+          'Critical game-design essay that analyses a commercially released title through the lens of solarpunk aesthetics and emergent gameplay theory, then proposes concrete design changes.',
+          'The essay identifies structural tensions between the game\'s stated themes and its mechanical systems, and argues for redesigns that would let the two layers reinforce rather than undercut each other.'
+        ],
+        //gallery:['Solarpunk reference','AI draft notes','Essay'],
+        //doc:'content/game design/fix a game essay/IDG5252_Assignment2_EGD_UgoRaskin_2024.pdf'
+      },
+    ],
+    xr: [
+      {
+        id:'pallet-safety',
+        title:'Pallet Safety VR Training',
+        tag:'VR · EHS · Internship',
+        year:'2025–26',
+        role:'Game Design Intern',
+        team:'Altheria Solutions · Brussels',
+        tools:'Unity · Blender · Substance 3D Painter',
+        outcome:'Shipped — internal product',
+        img:'content/xr design/Trainings-Altheria/PalletSafety/Screenshot 2025-11-28 082021.png',
+        imgs:[
+          'content/xr design/Trainings-Altheria/PalletSafety/Screenshot 2025-11-28 082021.png',
+          'content/xr design/Trainings-Altheria/PalletSafety/Screenshot 2025-11-28 082417.png',
+          'content/xr design/Trainings-Altheria/PalletSafety/Screenshot 2025-11-28 082549.png'
+        ],
+        desc:[
+          'Immersive VR training module for warehouse pallet safety, designed during my internship at Altheria Solutions. Workers learn correct stacking procedures, and how to recognize faulty pallets in a consequence-free virtual environment.',
+          'I designed the interaction flows, 3D objects and feedback systems.'
+        ],
+        gallery:['Scene overview','Stacking task','Debrief screen']
+      },
+      {
+        id:'adr-training',
+        title:'ADR Dangerous Goods VR Training',
+        tag:'VR · Compliance · EHS',
+        year:'2025–26',
+        role:'Game Design Intern',
+        team:'Altheria Solutions · Brussels',
+        tools:'Unity · Blender · Substance 3D Painter',
+        outcome:'Shipped — internal product',
+        img:'content/xr design/Trainings-Altheria/ADR/adrTraining.png',
+        imgs:[
+          'content/xr design/Trainings-Altheria/ADR/adrTraining.png',
+          ''
+        ],
+        desc:[
+          'VR compliance training for ADR regulations: the European agreement governing international road transport of dangerous goods. The module covers classification, labelling and emergency procedures.',
+          'Designed to replace costly in-person sessions, it uses branching scenarios and haptic feedback cues to reinforce correct handling behaviour under pressure.'
+        ],
+        //gallery:['ADR scenario','Training day','Interaction design']
+      }
+    ],
+    '3d': [
+      {
+        id:'3d-industrial',
+        title:'Industrial Equipment',
+        tag:'3D',
+        year:'2025–26',
+        role:'3D Artist · Intern',
+        team:'Altheria Solutions · Brussels',
+        tools:'Blender · Adobe Substance 3D Painter',
+        outcome:'Production assets — shipped',
+        img:'content/3d modeling/3D-Altheria/Industrial/ruggedTablet.png',
+        imgs:[
+          'content/3d modeling/3D-Altheria/Industrial/PackagingConveyorBelt.png',
+          'content/3d modeling/3D-Altheria/Industrial/SimaticMonitor.png',
+          'content/3d modeling/3D-Altheria/Industrial/measuringArm.png'
+        ],
+        desc:[
+          'Hard-surface 3D models of industrial equipment built for Altheria\'s VR training environments. The set includes a rugged field tablet, a Simatic HMI monitor, a precision measuring arm, a packaging conveyor belt and an engine dashboard.',
+          'All assets were optimised for real-time rendering on Meta Quest hardware, while maintaining visual fidelity close enough to the real objects for training value.'
+        ],
+        gallery:['Conveyor belt','Simatic monitor','Measuring arm']
+      },
+      {
+        id:'3d-graham',
+        title:'Graham Packaging / Lototo',
+        tag:'3D',
+        year:'2025–26',
+        role:'3D Artist · Intern',
+        team:'Altheria Solutions · Brussels',
+        tools:'Blender · Substance 3D Painter',
+        outcome:'Production assets — shipped',
+        img:'content/3d modeling/3D-Altheria/Graham_lototo/lototoLock.png',
+        imgs:[
+          'content/3d modeling/3D-Altheria/Graham_lototo/lototoLock.png',
+          'content/3d modeling/3D-Altheria/Graham_lototo/actimelBottle.png',
+          'content/3d modeling/3D-Altheria/Graham_lototo/grahamBox.png'
+        ],
+        desc:[
+          'Product visualisation models for Graham Group\'s Lototo lockout/tagout safety programme. Photorealistic Blender renders of the lockout padlock, an Actimel bottle used as a scale reference prop, and branded Graham packaging.',
+          'These assets were prepared and optimised for direct integration into VR safety-training content. The high-fidelity finish was required so trainees can identify the real objects on the job after practising with the VR counterparts.'
+        ],
+        gallery:['Lototo padlock','Scale prop','Graham packaging']
+      },
+      {
+        id:'3d-spw',
+        title:'SPW — Rural objects',
+        tag:'3D',
+        year:'2025–26',
+        role:'3D Artist · Intern',
+        team:'Altheria Solutions · Brussels',
+        tools:'Blender · Substance 3D Painter',
+        outcome:'Production assets — shipped',
+        img:'content/3d modeling/3D-Altheria/SPW/trailer.png',
+        imgs:[
+          'content/3d modeling/3D-Altheria/SPW/rifle.png',
+          'content/3d modeling/3D-Altheria/SPW/tractorWheel.png',
+          'content/3d modeling/3D-Altheria/SPW/odometre.png'
+        ],
+        desc:[
+          'Tools and transport assets for an SPW (Service Public de Wallonie) VR training brief. Models include a full road trailer, a tractor wheel assembly, a rifle, an odometer and supporting equipment.',
+          'Built to photorealistic standards for close-up inspection in VR, detail-level decisions (bolt heads, tyre tread, chassis seams) were driven by the training scenarios in which each asset would appear.'
+        ],
+        gallery:['Rifle','Tractor wheel','Odometer']
+      },
+      {
+        id:'3d-elec',
+        title:'Electrical Testing Equipment',
+        tag:'3D',
+        year:'2025–26',
+        role:'3D Artist · Intern',
+        team:'Altheria Solutions · Brussels',
+        tools:'Blender · Substance 3D Painter',
+        outcome:'Production assets — shipped',
+        img:'content/3d modeling/3D-Altheria/elecBox/voltTester.png',
+        imgs:[
+          'content/3d modeling/3D-Altheria/elecBox/NonContactTester.png',
+          'content/3d modeling/3D-Altheria/elecBox/CurrentVoltageTester.png',
+          'content/3d modeling/3D-Altheria/elecBox/HookClampTester.png'
+        ],
+        desc:[
+          'Prop assets for electrical safety VR modules: a voltage tester, a current/voltage combo unit, a hook clamp tester and a non-contact voltage probe.',
+          'Each model is textured to match real-world manufacturer finishes so trainees build accurate visual recognition of the tools, a prerequisite for safe on-site tool selection and use.'
+        ],
+        gallery:['Non-contact','Current/voltage','Hook clamp']
+      }
+    ],
+    motion: [
+      {
+        id:'mo-effects',
+        title:'Glitch Effects & Kinetic Text',
+        tag:'After Effects · VFX',
+        year:'2025',
+        role:'Motion Design',
+        team:'Solo · UM',
+        tools:'After Effects',
+        outcome:'Course assignment',
+        img:'content/motion design/glitcheffect.png',
+        imgs:[
+          'content/motion design/glitcheffect.png',
+          'content/motion design/kineticText.png',
+          'content/motion design/textSHot.png',
+
+        ],
+        desc:[
+          'Motion design studies exploring glitch aesthetics and kinetic typography in After Effects. The glitch piece uses channel-offset layers and RGB chromatic splitting to simulate VHS signal degradation.',
+          'Synchronised word and letter animations to a spoken-word audio track. Letter timing is driven by audio amplitude keyframes; the layout follows a strict typographic grid to maintain legibility through rapid motion.'
+        ],
+        //gallery:['Glitch frame','Clone static','Clone interact']
+      },
+      {
+        id:'mo-kinetic',
+        title:'Cloning and cinemagraphs',
+        tag:'After Effects · Motion',
+        year:'2025',
+        role:'Motion Design',
+        team:'Solo · UM',
+        tools:'After Effects',
+        outcome:'Course assignment',
+        img:'content/motion design/clone1.png',
+        imgs:[
+          'content/motion design/clone1.png',
+          'content/motion design/clone2interact.png',
+          'content/motion design/coffee.png'
+        ],
+        desc:[
+          'Duplication/clone effects exercise.',
+          'The clone compositions experiment with interactive motion paths to see clones interact with each other to create a sense of them being in the space.',
+          'I experimented with several types of cinemagraphs too with a frozen global image and an animnated fragment of the frame.'
+        ],
+        //gallery:['Title frame','Mid sequence','End card']
+      }
+    ],
+    research: [
+      {
+        id:'r-verticality',
+        title:'The Verticality Effect - MA Thesis',
+        tag:'Presence · Player Experience · Theories of Space',
+        year:'2025',
+        role:'Author',
+        team:'Solo · UoM',
+        tools:'Academic writing · Research · ATLAS.ti',
+        outcome:'Final grade 72/100',
+        img:'content/research/climbing.jpg',
+        imgs:['content/research/inGame.png','content/research/agencyBook.png','content/research/abstract.png'],
+        doc:'content/research/VerticalityThesis_FinalVersion.pdf',
+        desc:[
+          'This thesis investigates how verticality in modern 3D digital games functions as a key design element shaping player experience and fostering presence. Through an interpretive examination of the theories and qualitative analysis of case studies, the research demonstrates how verticality operates in relation to player experience. This study also provides a robust framework for analysing verticality, offering valuable insights for both game scholars and designers seeking to create more compelling experiences in digital games.'
+        ],
+        gallery:['Gordon Calleja','Bettina Bódi','']
+      },
+      //{
+      //  id:'r-twitter',
+      //  title:'Twitter & Trump — Big Data',
+      //  tag:'Research · Data Analysis',
+      //  year:'2022',
+      //  role:'Researcher',
+      //  team:'Solo · Maastricht University',
+      //  tools:'Python · VADER · Excel',
+      //  outcome:'Course project',
+      //  img:'',
+      //  imgs:['','',''],
+      //  doc:"content/research/Twitter's User Reaction Trump_Working with Big Data Project.pdf",
+      //  desc:[
+      //    'Quantitative analysis of Twitter user reactions to Donald Trump\'s tweets using VADER sentiment analysis and frequency modelling. The project maps emotional valence, virality patterns and partisan echo-chamber behaviour.',
+      //    'Demonstrates how big data methods expose affective dynamics on social platforms — and how platform affordances amplify certain emotional registers over others.'
+      //  ],
+      //  gallery:['Data visualisation','Sentiment graph','Methodology']
+      //},
+      //{
+      //  id:'r-qr',
+      //  title:'QR Codes as Digital Access Keys',
+      //  tag:'Research · Policy · Digital Inclusion',
+      //  year:'2023',
+      //  role:'Author',
+      //  team:'Solo · Maastricht University',
+      //  tools:'Academic writing',
+      //  outcome:'Submitted',
+      //  img:'',
+      //  imgs:['','',''],
+      //  doc:'content/research/Using QR Codes as a Digital Access Key for Public Spaces.pdf',
+      //  desc:[
+      //    'Policy-oriented research paper examining the use of QR codes as access-control mechanisms for public and semi-public spaces — a practice dramatically accelerated by the COVID-19 pandemic.',
+      //    'The paper critically evaluates inclusion, surveillance and digital literacy implications, and proposes design principles for equitable deployment that do not systematically exclude non-smartphone users or older adults.'
+      //  ],
+      //  gallery:['Paper','Key findings','Policy recs']
+      //},
+      //{
+      //  id:'r-policy',
+      //  title:'Policy Brief — Digital Society',
+      //  tag:'Research · Policy Writing',
+      //  year:'2023',
+      //  role:'Author',
+      //  team:'Solo · Maastricht University',
+      //  tools:'Academic writing · InDesign',
+      //  outcome:'Submitted',
+      //  img:'',
+      //  imgs:['','',''],
+      //  doc:'content/research/Policy Brief.docx',
+      //  desc:[
+      //    'Structured policy brief addressed to a fictional governmental stakeholder, proposing evidence-based regulatory recommendations on a digital society issue. Follows the standard policy memo format: executive summary, problem statement, options analysis and recommendation.',
+      //    'Accompanied by a video pitch script (resit version) that distils the brief\'s core argument into a 3-minute verbal presentation — a useful exercise in translating academic rigour into public-facing communication.'
+      //  ],
+      //  gallery:['Brief','Options matrix','Recommendation']
+      //}
+    ]
+  };
+
+  // ── RENDER THUMBS ───────────────────────────────────────
+  const thumbsEl = document.getElementById('thumbs');
+  const panelEl = document.getElementById('panel');
+  const panelBody = document.getElementById('panel-body');
+  const panelCounter = document.getElementById('panel-counter');
+  const pinHint = document.getElementById('pin-hint');
+  let activeCat = 'game';
+  let activeIdx = null;
+  let pinnedIdx = null;
+
+  function num(i){return String(i+1).padStart(2,'0')}
+
+  function renderThumbs(cat){
+    thumbsEl.innerHTML = '';
+    thumbsEl.classList.remove('has-active');
+    thumbsEl.dataset.count = PROJECTS[cat].length;
+    activeIdx = null; pinnedIdx = null;
+    panelEl.classList.add('resting');
+    panelCounter.textContent = `— / ${PROJECTS[cat].length.toString().padStart(2,'0')}`;
+    PROJECTS[cat].forEach((p,i)=>{
+      const el = document.createElement('div');
+      el.className = 'thumb' + (p.empty ? ' empty' : '');
+      el.dataset.idx = i;
+      const hasImg = p.img && p.img.length > 0;
+      const imgCls = hasImg ? ' real' : '';
+      const imgSty = hasImg ? ` style="background-image:url('${p.img}')"` : '';
+      el.innerHTML = `
+        <div class="thumb-img${imgCls}"${imgSty}></div>
+        <div class="thumb-shade"></div>
+        <!-- <span class="thumb-num">${num(i)}</span> -->
+        <span class="thumb-tag">${p.tag||''}</span>
+        <div class="thumb-meta">
+          <div class="title">${p.title}</div>
+          <!-- <div class="role">${p.role || (p.empty ? '— placeholder —' : '')}</div> -->
+        </div>
+      `;
+      thumbsEl.appendChild(el);
+    });
+    bindThumbs(cat);
+  }
+
+  function renderPanel(cat,i){
+    const p = PROJECTS[cat][i];
+    panelBody.classList.add('swapping');
+    panelCounter.textContent = `${num(i)} / ${PROJECTS[cat].length.toString().padStart(2,'0')}`;
+    setTimeout(()=>{
+      const galleryLabels = p.gallery || ['','',''];
+      const galleryImgs   = p.imgs    || ['','',''];
+      const galHtml = galleryLabels.map((lbl,k)=>{
+        const src = galleryImgs[k] || '';
+        if(src) return `<div class="ph real" style="background-image:url('${src}')" data-label="${lbl||''}"></div>`;
+        return `<div class="ph" data-label="${lbl||''}"></div>`;
+      }).join('');
+      const docHtml = p.doc
+        ? `<div style="margin-top:2px"><a href="${p.doc}" target="_blank" style="font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);padding-bottom:1px">View document →</a></div>`
+        : '';
+      panelBody.innerHTML = `
+        <span class="ptag">${p.tag||''} · ${p.year||''}</span>
+        <h3 class="ptitle">${p.title}</h3>
+        <div class="pmeta-grid">
+          <div><b>Role</b>${p.role||'—'}</div>
+          <div><b>Team</b>${p.team||'—'}</div>
+          <div><b>Tools</b>${p.tools||'—'}</div>
+          <div><b>Outcome</b>${p.outcome||'—'}</div>
+        </div>
+        <div class="pdesc">${(p.desc||[]).map(d=>`<p>${d}</p>`).join('')}</div>
+        ${docHtml}
+        <div class="pgallery">${galHtml}</div>
+      `;
+      panelBody.classList.remove('swapping');
+    },180);
+  }
+
+  function setActive(i){
+    activeIdx = i;
+    thumbsEl.classList.add('has-active');
+    [...thumbsEl.children].forEach((el,k)=>{
+      el.classList.toggle('active', k===i);
+    });
+    panelEl.classList.remove('resting');
+    renderPanel(activeCat,i);
+  }
+  function clearActive(){
+    if(pinnedIdx!==null) return; // pinned stays
+    activeIdx = null;
+    thumbsEl.classList.remove('has-active');
+    [...thumbsEl.children].forEach(el=>el.classList.remove('active'));
+    panelEl.classList.add('resting');
+    panelCounter.textContent = `— / ${PROJECTS[activeCat].length.toString().padStart(2,'0')}`;
+  }
+
+  function bindThumbs(cat){
+    [...thumbsEl.children].forEach((el,i)=>{
+      el.addEventListener('mouseenter', ()=>{
+        if(pinnedIdx!==null) return;
+        setActive(i);
+      });
+      el.addEventListener('click', (e)=>{
+        if(pinnedIdx === i){
+          // unpin
+          pinnedIdx = null;
+          el.classList.remove('pinned');
+          pinHint.classList.remove('hidden');
+          pinHint.textContent = 'click to pin ✦';
+          clearActive();
+        } else {
+          // unpin previous
+          if(pinnedIdx!==null){
+            const prev = thumbsEl.children[pinnedIdx];
+            if(prev) prev.classList.remove('pinned');
+          }
+          pinnedIdx = i;
+          setActive(i);
+          el.classList.add('pinned');
+          pinHint.classList.remove('hidden');
+          pinHint.textContent = 'pinned · click to release';
+        }
+      });
+    });
+    thumbsEl.addEventListener('mouseleave', ()=>{
+      if(pinnedIdx===null) clearActive();
+    });
+  }
+
+  // ── CAT TABS ───────────────────────────────────────────
+  document.querySelectorAll('#cat-tabs button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#cat-tabs button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.dataset.cat;
+      renderThumbs(activeCat);
+    });
+  });
+  renderThumbs(activeCat);
+
+  // ── ESC releases pin ───────────────────────────────────
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape' && pinnedIdx!==null){
+      const prev = thumbsEl.children[pinnedIdx];
+      if(prev) prev.classList.remove('pinned');
+      pinnedIdx = null;
+      pinHint.textContent = 'click to pin ✦';
+      clearActive();
+    }
+  });
+
+  // ── NAV active state on scroll ─────────────────────────
+  const navLinks = document.querySelectorAll('.rail-nav a');
+  const sections = [...document.querySelectorAll('section.page')];
+  function updateNav(){
+    const y = window.scrollY + window.innerHeight*0.35;
+    let cur = sections[0].id;
+    sections.forEach(s=>{
+      if(s.offsetTop <= y) cur = s.id;
+    });
+    navLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+cur));
+  }
+  window.addEventListener('scroll', updateNav, {passive:true});
+  updateNav();
+
+  // ── scroll arrow → next section ────────────────────────
+  document.getElementById('scroll-arrow').addEventListener('click', ()=>{
+    const y = window.scrollY + window.innerHeight*0.5;
+    const next = sections.find(s=>s.offsetTop > y);
+    if(next) next.scrollIntoView({behavior:'smooth'});
+    else sections[0].scrollIntoView({behavior:'smooth'});
+  });
+
+  // ── clock ──────────────────────────────────────────────
+  function tick(){
+    const d = new Date();
+    document.getElementById('clock').textContent =
+      d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) + ' BE';
+  }
+  tick(); setInterval(tick, 30000);
+</script>
+</body>
+</html>

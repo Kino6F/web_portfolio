@@ -395,7 +395,7 @@
     background-position: center;
   }
   .portrait::after{
-    content:"[ Ugo having a good experience ]";position:absolute;left:14px;bottom:10px;font-size:10px;
+    content:"Ugo having a good experience";position:absolute;left:14px;bottom:10px;font-size:10px;
     color:var(--muted);background:var(--paper);padding:3px 7px;border:1px solid var(--line-soft);
     letter-spacing:.14em;text-transform:uppercase
   }
@@ -948,15 +948,15 @@
       <span class="index">06 / 06</span>
     </div>
     <div class="ct-grid">
-      <form class="ct-form" onsubmit="event.preventDefault();this.querySelector('.send').textContent='Sent ✓'">
-        <input class="field" type="text" placeholder="Your name" required>
-        <input class="field" type="email" placeholder="Your email" required>
-        <input class="field full" type="text" placeholder="Subject">
-        <textarea class="field full" placeholder="Message"></textarea>
+      <form class="ct-form" id="contact-form">
+        <input class="field" type="text" name="name" placeholder="Your name" required>
+        <input class="field" type="email" name="email" placeholder="Your email" required>
+        <input class="field full" type="text" name="subject" placeholder="Subject">
+        <textarea class="field full" name="message" placeholder="Message"></textarea>
         <button class="send" type="submit">Send <span class="arrow">→</span></button>
       </form>
       <div class="ct-side">
-        <div class="row"><b>email</b><span class="v"><a href="/cdn-cgi/l/email-protection#deacbfadb5b7b0abb9b19eb7bdb2b1abbaf0bdb1b3"><span class="__cf_email__" data-cfemail="eb998a988082859e8c84ab828887849e8fc5888486">[email&#160;protected]</span></a></span></div>
+        <div class="row"><b>email</b><span class="v"><a href="mailto:raskinugo@icloud.com">raskinugo@icloud.com</a></span></div>        
         <div class="row"><b>phone</b><span class="v"><a href="tel:+32475768230">+32 475 76 82 30</a></span></div>
         <div class="row"><b>location</b><span class="v">Brussels, Belgium</span></div>
         <div class="socials">
@@ -1437,6 +1437,24 @@
       pinnedIdx = null;
       pinHint.textContent = 'click to pin ✦';
       clearActive();
+    }
+  });
+
+  // --- Contact Form ---
+  document.getElementById('contact-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('.send');
+    btn.textContent = 'Sending…';
+    const res = await fetch('https://formspree.io/f/xbdwqkaw', {
+      method: 'POST',
+      body: new FormData(this),
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      btn.textContent = 'Sent ✓';
+      this.reset();
+    } else {
+      btn.textContent = 'Error — try again';
     }
   });
 

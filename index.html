@@ -591,12 +591,17 @@
     .ct-grid{grid-template-columns:1fr;gap:36px}
   }
   @media (max-width: 720px){
-    :root{--rail:48px;--side-pad:18px}
-    .rail{padding:14px 0}
-    .logo{width:34px;height:34px;font-size:15px}
+    :root{--rail:32px;--side-pad:18px}
+    .rail{padding:10px 0}
+    .logo{width:26px;height:26px;font-size:12px}
     .rail-nav{gap:18px}
     .rail-nav a{font-size:10px;letter-spacing:.18em}
-    .rail.right .clock,.rail.right .here{display:none}
+    /* hide the numbers on left nav links */
+    .rail-nav a .num{ display: none }
+    /* hide right rail text and also the scroll label */
+    .rail.right .scroll-cue span{ display: none }
+    .rail.right .scroll-cue .arrow{ width: 26px; height: 26px; font-size: 12px }
+    .rail.right .clock,.rail.right .here{visibility: hidden;}
     .hero-bottom{grid-template-columns:1fr;gap:18px;text-align:left}
     .hero-bottom .next-cue{justify-self:start}
     .thumbs{grid-template-columns:1fr 1fr;height:auto;gap:10px}
@@ -653,8 +658,14 @@
 
   /* ── extra-small phones (≤ 400px) — single-column thumbs ── */
   @media (max-width: 400px){
-    .thumbs{grid-template-columns:1fr}
-    .thumb{aspect-ratio:4/3}
+    .thumbs,
+    .thumbs[data-count="1"],
+    .thumbs[data-count="2"],
+    .thumbs[data-count="3"],
+    .thumbs[data-count="4"]{
+      grid-template-columns:1fr
+    }
+    .thumb{aspect-ratio:16/9}
     .thumb .thumb-meta .title{font-size:18px;line-clamp:1;-webkit-line-clamp:1}
   }
 </style>
